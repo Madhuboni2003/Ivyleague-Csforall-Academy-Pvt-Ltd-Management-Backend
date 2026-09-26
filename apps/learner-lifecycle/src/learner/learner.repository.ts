@@ -11,7 +11,6 @@ import {
 export class LearnerRepository {
   constructor(private readonly prisma: ModelService) {}
 
-
     findStatusById(id: number) {
         return this.prisma.learnerLifecycle.findUnique({
             where: {
