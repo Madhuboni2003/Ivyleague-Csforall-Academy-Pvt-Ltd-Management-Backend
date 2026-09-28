@@ -16,9 +16,13 @@ export interface ServiceRoute {
 const identityAccess =
     process.env.IDENTITY_ACCESS_URL ?? 'http://localhost:3001';
 
+const learnerLifecycle =
+    process.env.LEARNER_LIFECYCLE_URL ?? 'http://localhost:3002';
+
 export const serviceRoutes: ServiceRoute[] = [
     { prefix: '/api/v1/auth', upstream: identityAccess },
     { prefix: '/api/v1/users', upstream: identityAccess },
     { prefix: '/api/v1/brands', upstream: identityAccess },
     { prefix: '/api/v1/tc-versions', upstream: identityAccess },
+    { prefix: '/api/v1/learners', upstream: learnerLifecycle },
 ];
