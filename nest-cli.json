@@ -51,6 +51,21 @@
         "tsConfigPath": "libs/model/tsconfig.lib.json"
       }
     },
+    "notification-service": {
+      "type": "application",
+      "root": "apps/notification-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/notification-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notification-service/tsconfig.app.json",
+        "assets": [
+      {
+        "include": "templates/**/*",
+        "watchAssets": true
+      }
+    ]
+      }
+    },
     "rbac": {
       "type": "library",
       "root": "libs/rbac",

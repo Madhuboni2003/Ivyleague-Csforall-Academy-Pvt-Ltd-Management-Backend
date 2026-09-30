@@ -1,6 +1,7 @@
 import { StaffRole, UserStatus } from '@app/model/generated/prisma/enums.js';
 
 export type StaffAccount = {
+    id: number;
     publicId: string;
     fullName: string;
     email: string;

@@ -32,6 +32,7 @@ import { UserRepository } from './user.repsitory.js';
 import { StaffAccount } from './types/staff-account.type.js';
 import { LearnerAccount } from './types/learner-account.type.js';
 import { IssuedAccessToken } from '../access-token/types/issues-access-token.type.js';
+import { AccountActivationNotificationProducer } from '../notification/account-activation/account-activation.producer.js';
 
 @Injectable()
 export class UserService {
@@ -44,6 +45,7 @@ export class UserService {
         private readonly accessTokenService: AccessTokenService,
         private readonly brandRepository: BrandRepository,
         private readonly userBrandAccessRepository: UserBrandAccessRepository,
+        private readonly accountActivationNotificationProducer: AccountActivationNotificationProducer,
     ) {}
 
     async updateUserStatus(
@@ -248,7 +250,7 @@ export class UserService {
         const invite: IssuedAccessToken = this.accessTokenService.issue();
 
         try {
-            return await this.prisma.$transaction(async (tx) => {
+            const staffAccount = await this.prisma.$transaction(async (tx) => {
                 const staff: User = await this.userRepository.create(
                     {
                         fullName: payload.fullName,
@@ -287,6 +289,7 @@ export class UserService {
                 }
 
                 return {
+                    id: staff.id,
                     publicId: staff.publicId,
                     fullName: staff.fullName,
                     email: staff.email,
@@ -300,6 +303,25 @@ export class UserService {
                     activationExpiresAt: invite.expiresAt,
                 };
             });
+
+            await this.accountActivationNotificationProducer.enqueue({
+                recipientUserId: staffAccount.id,
+                brandId: brands.length === 1 ? brands[0].id : undefined,
+                recipientEmail: staffAccount.email,
+                recipientName: staffAccount.fullName,
+                subject: 'Activate your InterviewCall account',
+                channels: ['EMAIL'],
+                templateKeys: {
+                    EMAIL: 'AccountActivation',
+                },
+                data: {
+                    recipientName: staffAccount.fullName,
+                    activationUrl: staffAccount.activationUrl,
+                },
+            });
+
+            return staffAccount;
+
         } catch (error) {
             if (
                 error instanceof Prisma.PrismaClientKnownRequestError &&

@@ -19,7 +19,7 @@ model NotificationLog {
     recipientUserId Int      @map("recipient_user_id")
     channel         String
     status          String
-    sentAt          DateTime @map("sent_at")
+    sentAt DateTime @map("sent_at")
 
     template NotificationTemplate @relation(fields: [templateId], references: [id])
 
