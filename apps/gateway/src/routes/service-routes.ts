@@ -16,9 +16,13 @@ export interface ServiceRoute {
 const identityAccess =
     process.env.IDENTITY_ACCESS_URL ?? 'http://localhost:3001';
 
+const supportCases =
+    process.env.SUPPORT_CASES_URL ?? 'http://localhost:3004';
+
 export const serviceRoutes: ServiceRoute[] = [
     { prefix: '/api/v1/auth', upstream: identityAccess },
     { prefix: '/api/v1/users', upstream: identityAccess },
     { prefix: '/api/v1/brands', upstream: identityAccess },
     { prefix: '/api/v1/tc-versions', upstream: identityAccess },
+    { prefix: '/api/v1/cases', upstream: supportCases },
 ];

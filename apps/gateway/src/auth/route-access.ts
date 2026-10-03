@@ -43,6 +43,12 @@ export const accessRules: AccessRule[] = [
         path: /^\/api\/v1\/brands\/[^/]+$/,
         roles: ADMIN_ONLY,
     },
+
+    {
+        method: 'GET',
+        path: /^\/api\/v1\/cases\/[^/]+\/evidence-package$/,
+        roles: ['ACADEMIC_HEAD'],
+    },
 ];
 
 export function findAccessRule(

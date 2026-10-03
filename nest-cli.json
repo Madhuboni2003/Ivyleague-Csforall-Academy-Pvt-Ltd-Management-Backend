@@ -59,6 +59,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/rbac/tsconfig.lib.json"
       }
+    },
+    "support-cases": {
+      "type": "application",
+      "root": "apps/support-cases",
+      "entryFile": "main",
+      "sourceRoot": "apps/support-cases/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/support-cases/tsconfig.app.json"
+      }
     }
   }
 }
