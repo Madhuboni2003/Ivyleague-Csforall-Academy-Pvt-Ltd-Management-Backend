@@ -1,9 +1,18 @@
+enum TicketStatus {
+    OPEN
+    IN_PROGRESS
+    AWAITING_LEARNER
+    ESCALATED
+    RESOLVED
+    CLOSED
+}
+
 model Ticket {
     id              Int       @id @default(autoincrement())
     learnerId       Int       @map("learner_id")
     category        String    @db.VarChar(100)
     description     String    @db.Text
-    status          String    @db.VarChar(50)
+    status          TicketStatus @default(OPEN)
     ownerUserId     Int?      @map("owner_user_id")
     resolution      String?   @db.Text
     learnerAccepted Boolean?  @map("learner_accepted")

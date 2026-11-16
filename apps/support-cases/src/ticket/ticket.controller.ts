@@ -1,9 +1,10 @@
-import { Body, Controller,  Get, Post, Query } from '@nestjs/common';
+import { Body, Controller,  Get, Post, Query, Patch,Param , ParseIntPipe,} from '@nestjs/common';
 import { AccessRole, CurrentUser, Roles , STAFF_ROLES } from '@app/rbac';
 import type { Principal } from '@app/rbac';
 import { TicketService } from './ticket.service.js';
 import { CreateTicketDto, createTicketSchema } from './dto/create-ticket.dto.js';
 import { ListTicketsQuery, listTicketsQuerySchema } from './dto/list-tickets.query.js';
+import { UpdateTicketDto, updateTicketSchema } from './dto/update-ticket.dto.js';
 
 @Controller('tickets')
 export class TicketController {
@@ -25,5 +26,19 @@ export class TicketController {
         query: ListTicketsQuery,
     ) {
         return this.ticketService.listTickets(query);
+    }
+
+    @Roles(AccessRole.PSA)
+    @Patch(':id')
+    updateTicket(
+        @Param('id', ParseIntPipe) ticketId: number,
+        @CurrentUser() user: Principal,
+        @Body({ schema: updateTicketSchema }) payload: UpdateTicketDto,
+    ) {
+        return this.ticketService.updateTicket(
+            ticketId,
+            Number(user.userId),
+            payload,
+        );
     }
 }
