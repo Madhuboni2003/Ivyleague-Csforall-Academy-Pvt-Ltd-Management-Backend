@@ -20,3 +20,5 @@ export class UpdateTicketDto implements z.infer<typeof updateTicketSchema> {
     status?: z.infer<typeof updateTicketSchema>['status'];
     resolution?: string;
 }
+
+export const ticketIdParamSchema = z.coerce.number().int().positive();
