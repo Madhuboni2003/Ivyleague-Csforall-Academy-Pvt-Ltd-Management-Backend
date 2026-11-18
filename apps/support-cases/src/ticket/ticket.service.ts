@@ -1,10 +1,13 @@
-import { Injectable ,NotFoundException, BadRequestException} from '@nestjs/common';
+import { Injectable ,NotFoundException, BadRequestException , ForbiddenException } from '@nestjs/common';
 import { Ticket } from '@app/model/generated/prisma/client.js';
 import { getLearnerIdByUserId } from '../apis/learner-lifecycle.api.js';
 import { TicketRepository } from './ticket.repository.js';
 import { ListTicketsQuery } from './dto/list-tickets.query.js';
 import { TicketStatus } from '@app/model/generated/prisma/enums.js';
 import { UpdateTicketDto } from './dto/update-ticket.dto.js';
+import { AccessRole } from '@app/rbac';
+import type { Principal } from '@app/rbac';
+import { AcceptTicketDto } from './dto/accept-ticket.dto.js';
 
 @Injectable()
 export class TicketService {
@@ -48,4 +51,40 @@ export class TicketService {
                 ticket.ownerUserId === null && { ownerUserId: userId }),
         });
     }
+
+    async acceptTicket(
+    ticketId: number,
+    user: Principal,
+    payload: AcceptTicketDto,
+): Promise<Ticket> {
+    const ticket = await this.ticketRepository.findById(ticketId);
+
+    if (!ticket) throw new NotFoundException('Ticket not found');
+
+    if (ticket.status !== TicketStatus.RESOLVED) {
+        throw new BadRequestException(
+            'Only resolved tickets can be accepted or rejected',
+        );
+    }
+
+    // ADMIN can respond to any ticket; learners can respond only to their own.
+    const isOwner = user.roles.includes(AccessRole.ADMIN) ||
+        ticket.learnerId === (await getLearnerIdByUserId(Number(user.userId))).learnerId;
+
+    if (!isOwner) {
+        throw new ForbiddenException('You can only respond to your own tickets');
+    }
+
+    return this.ticketRepository.update(ticketId, payload.accepted
+        ? {
+            learnerAccepted: true,
+            status: TicketStatus.CLOSED,
+            resolvedAt: new Date(),
+        }
+        : {
+            learnerAccepted: false,
+            status: TicketStatus.IN_PROGRESS,
+        },
+    );
+}
 }

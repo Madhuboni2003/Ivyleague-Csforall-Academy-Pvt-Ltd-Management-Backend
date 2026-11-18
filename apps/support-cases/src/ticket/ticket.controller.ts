@@ -5,7 +5,8 @@ import { TicketService } from './ticket.service.js';
 import { CreateTicketDto, createTicketSchema } from './dto/create-ticket.dto.js';
 import { ListTicketsQuery, listTicketsQuerySchema } from './dto/list-tickets.query.js';
 import { UpdateTicketDto, updateTicketSchema , ticketIdParamSchema, } from './dto/update-ticket.dto.js';
-
+import { AcceptTicketDto, acceptTicketSchema } from './dto/accept-ticket.dto.js';
+    
 @Controller('tickets')
 export class TicketController {
     constructor(private readonly ticketService: TicketService) {}
@@ -38,6 +39,20 @@ export class TicketController {
         return this.ticketService.updateTicket(
             ticketId,
             Number(user.userId),
+            payload,
+        );
+    }
+
+    @Roles(AccessRole.LEARNER)
+    @Patch(':id/accept')
+    acceptTicket(
+        @Param('id', { schema: ticketIdParamSchema }) ticketId: number,
+        @CurrentUser() user: Principal,
+        @Body({ schema: acceptTicketSchema }) payload: AcceptTicketDto,
+    ) {
+        return this.ticketService.acceptTicket(
+            ticketId,
+            user,
             payload,
         );
     }
